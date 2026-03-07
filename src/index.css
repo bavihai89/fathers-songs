@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Secular+One&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #1a1008;
+  --color-page: #f5ead6;
+  --color-page-shadow: #c9a96e;
+  --color-ink: #2c1a0e;
+  --color-accent: #8b4513;
+  --color-accent-light: #c4813a;
+  --color-gold: #c9a53d;
+  --color-muted: #7a5c3a;
+  --font-main: 'Frank Ruhl Libre', 'David', serif;
+  --font-title: 'Secular One', 'Arial Hebrew', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--color-bg);
+  font-family: var(--font-main);
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
