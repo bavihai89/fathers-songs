@@ -3,6 +3,7 @@ import SongList from './SongList';
 import SongEditor from './SongEditor';
 import BookEditor from './BookEditor';
 import ExportPanel from './ExportPanel';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const NAV = [
   { id: 'songs', label: 'שירים', icon: '✦' },
@@ -16,6 +17,7 @@ export default function StudioLayout({
 }) {
   const [section, setSection] = useState('songs');
   const [selectedSong, setSelectedSong] = useState(null);
+  const isMobile = useIsMobile();
 
   function handleSelectSong(song) { setSelectedSong(song); }
 
@@ -54,9 +56,9 @@ export default function StudioLayout({
       </div>
 
       {/* Body */}
-      <div style={S.body}>
-      {/* Sidebar */}
-      <aside style={S.sidebar}>
+      <div style={{ ...S.body, flexDirection: isMobile ? 'column' : 'row' }}>
+      {/* Sidebar — hidden on mobile, replaced by bottom tab bar */}
+      <aside style={{ ...S.sidebar, display: isMobile ? 'none' : 'flex' }}>
         <div style={S.sidebarTop}>
           <div style={S.logoTitle}>{book.title || 'שירי פאפו'}</div>
           <div style={S.logoSub}>סטודיו עריכה</div>
@@ -90,23 +92,48 @@ export default function StudioLayout({
       {/* Main */}
       <main style={S.main}>
         {section === 'songs' && (
-          <div style={S.splitPane}>
-            <div style={S.listPane}>
-              <SongList
-                songs={songs}
-                selectedId={selectedSong?.id}
-                onSelect={handleSelectSong}
-                onNew={handleNewSong}
-                onImport={handleImportSong}
-              />
+          isMobile ? (
+            // Mobile: show list OR editor, not split
+            selectedSong ? (
+              <div style={{ flex: 1, overflow: 'auto' }}>
+                <button
+                  onClick={() => setSelectedSong(null)}
+                  style={S.mobileBackBtn}
+                >
+                  ← חזרה לרשימה
+                </button>
+                <SongEditor key={selectedSong.id} song={selectedSong} onSave={handleSongSaved} onDelete={handleDeleteSong} />
+              </div>
+            ) : (
+              <div style={{ flex: 1, overflow: 'auto' }}>
+                <SongList
+                  songs={songs}
+                  selectedId={selectedSong?.id}
+                  onSelect={handleSelectSong}
+                  onNew={handleNewSong}
+                  onImport={handleImportSong}
+                />
+              </div>
+            )
+          ) : (
+            <div style={S.splitPane}>
+              <div style={S.listPane}>
+                <SongList
+                  songs={songs}
+                  selectedId={selectedSong?.id}
+                  onSelect={handleSelectSong}
+                  onNew={handleNewSong}
+                  onImport={handleImportSong}
+                />
+              </div>
+              <div style={S.editorPane}>
+                {selectedSong
+                  ? <SongEditor key={selectedSong.id} song={selectedSong} onSave={handleSongSaved} onDelete={handleDeleteSong} />
+                  : <EmptyEditor onNew={handleNewSong} />
+                }
+              </div>
             </div>
-            <div style={S.editorPane}>
-              {selectedSong
-                ? <SongEditor key={selectedSong.id} song={selectedSong} onSave={handleSongSaved} onDelete={handleDeleteSong} />
-                : <EmptyEditor onNew={handleNewSong} />
-              }
-            </div>
-          </div>
+          )
         )}
         {section === 'book' && (
           <BookEditor songs={songs} book={book} onUpdateBook={onUpdateBook} onReorderSongs={onReorderSongs} onUpdateSong={onUpdateSong} />
@@ -116,6 +143,22 @@ export default function StudioLayout({
         )}
       </main>
       </div>
+
+      {/* Mobile bottom tab bar */}
+      {isMobile && (
+        <nav style={S.mobileTabBar}>
+          {NAV.map(item => (
+            <button
+              key={item.id}
+              style={{ ...S.mobileTab, ...(section === item.id ? S.mobileTabActive : {}) }}
+              onClick={() => { setSection(item.id); setSelectedSong(null); }}
+            >
+              <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
+              <span style={{ fontSize: '0.72rem' }}>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }
@@ -348,5 +391,42 @@ const S = {
     fontFamily: "'Frank Ruhl Libre', serif",
     letterSpacing: '0.03em',
     transition: 'all 0.2s',
+  },
+  mobileTabBar: {
+    display: 'flex',
+    borderTop: '1px solid rgba(201,165,61,0.18)',
+    background: '#150f07',
+    flexShrink: 0,
+  },
+  mobileTab: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.2rem',
+    padding: '0.65rem 0.5rem',
+    background: 'transparent',
+    border: 'none',
+    color: 'rgba(200,176,144,0.45)',
+    cursor: 'pointer',
+    fontFamily: "'Heebo', sans-serif",
+  },
+  mobileTabActive: {
+    color: '#c9a53d',
+    background: 'rgba(201,165,61,0.07)',
+  },
+  mobileBackBtn: {
+    display: 'block',
+    background: 'none',
+    border: 'none',
+    color: '#c9a53d',
+    fontFamily: "'Heebo', sans-serif",
+    fontSize: '0.9rem',
+    padding: '0.75rem 1rem',
+    cursor: 'pointer',
+    borderBottom: '1px solid rgba(201,165,61,0.12)',
+    width: '100%',
+    textAlign: 'right',
   },
 };

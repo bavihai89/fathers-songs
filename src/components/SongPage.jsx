@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) {
+  const isMobile = useIsMobile();
   const finalSongs = songs.filter(s => s.status === 'final');
   const song = songs[index];
   const finalIndex = finalSongs.indexOf(song);
@@ -14,9 +16,15 @@ export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) 
   const activeLyrics = showNikud && hasNikud ? song.lyricsNikud : song.lyrics;
   const stanzas = (activeLyrics || '').split(/\n\n+/);
 
+  const mobileWrapper = isMobile ? { padding: 0 } : {};
+  const mobilePage = isMobile ? { maxWidth: '100%', borderRadius: 0, boxShadow: 'none' } : {};
+  const mobileContent = isMobile ? { padding: '1.2rem 1.1rem' } : {};
+  const mobileTitle = isMobile ? { fontSize: '1.65rem' } : {};
+  const mobileArrowBtn = isMobile ? { fontSize: '1.05rem', padding: '0.6rem 0.5rem', minWidth: '90px' } : {};
+
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.page}>
+    <div style={{ ...styles.wrapper, ...mobileWrapper }}>
+      <div style={{ ...styles.page, ...mobilePage }}>
         {/* Song image — full bleed at top */}
         {song.image && (
           <div style={styles.songImageWrap}>
@@ -26,7 +34,7 @@ export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) 
         )}
 
         {/* Padded content area */}
-        <div style={styles.content}>
+        <div style={{ ...styles.content, ...mobileContent }}>
 
         {/* Navigation top */}
         <div style={styles.topNav}>
@@ -48,7 +56,7 @@ export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) 
         <div style={styles.divider} />
 
         {/* Song title */}
-        <h2 style={styles.title}>{song.title}</h2>
+        <h2 style={{ ...styles.title, ...mobileTitle }}>{song.title}</h2>
 
         <div style={styles.ornament}>✦</div>
 
@@ -85,14 +93,14 @@ export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) 
         {/* Navigation bottom */}
         <div style={styles.bottomNav}>
           <button
-            style={{ ...styles.arrowBtn, opacity: isLast ? 0.3 : 1 }}
+            style={{ ...styles.arrowBtn, ...mobileArrowBtn, opacity: isLast ? 0.3 : 1 }}
             onClick={onNext}
             disabled={isLast}
           >
             ← שיר הבא
           </button>
           <button
-            style={{ ...styles.arrowBtn, opacity: isFirst ? 0.3 : 1 }}
+            style={{ ...styles.arrowBtn, ...mobileArrowBtn, opacity: isFirst ? 0.3 : 1 }}
             onClick={onPrev}
             disabled={isFirst}
           >
