@@ -178,7 +178,8 @@ const S = {
   root: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh',
+    height: '100vh',
+    overflow: 'hidden',
     background: '#231810',
     direction: 'rtl',
     fontFamily: "'Heebo', 'Arial Hebrew', sans-serif",
