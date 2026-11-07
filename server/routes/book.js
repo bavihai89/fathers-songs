@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import { readFile, writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { join } from 'path';
+import { DATA_DIR } from '../init.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = join(__dirname, '../../data/book.json');
+const DATA_PATH = join(DATA_DIR, 'book.json');
 
 const router = Router();
 

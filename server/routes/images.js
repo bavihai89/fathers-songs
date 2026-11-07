@@ -1,13 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const IMAGES_DIR = join(__dirname, '../../public/images');
-
-if (!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true });
+import { join } from 'path';
+import { IMAGES_DIR } from '../init.js';
 
 const storage = multer.diskStorage({
   destination: IMAGES_DIR,

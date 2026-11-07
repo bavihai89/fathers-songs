@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { existsSync } from 'fs';
 import { config } from 'dotenv';
+import { initPersistentStorage, IMAGES_DIR } from './init.js';
 import songsRouter from './routes/songs.js';
 import bookRouter from './routes/book.js';
 import imagesRouter from './routes/images.js';
@@ -11,6 +11,8 @@ import audioRouter from './routes/audio.js';
 import nikudRouter from './routes/nikud.js';
 
 config({ path: join(dirname(fileURLToPath(import.meta.url)), '../.env') });
+
+await initPersistentStorage();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isProd = process.env.NODE_ENV === 'production';
@@ -20,8 +22,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve uploaded images
-app.use('/images', express.static(join(__dirname, '../public/images')));
+// Serve images from persistent storage (or public/images in dev)
+app.use('/images', express.static(IMAGES_DIR));
 
 app.use('/api/songs', songsRouter);
 app.use('/api/book', bookRouter);

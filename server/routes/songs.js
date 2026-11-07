@@ -1,14 +1,12 @@
 import { Router } from 'express';
 import { readFile, writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import multer from 'multer';
 import mammoth from 'mammoth';
+import { DATA_DIR } from '../init.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = join(__dirname, '../../data/songs.json');
+const DATA_PATH = join(DATA_DIR, 'songs.json');
 
 async function readSongs() {
   const raw = await readFile(DATA_PATH, 'utf-8');
