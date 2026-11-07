@@ -33,7 +33,8 @@ app.use('/api/nikud', nikudRouter);
 if (isProd) {
   const distPath = join(__dirname, '../dist');
   app.use(express.static(distPath));
-  app.get('*', (req, res) => res.sendFile(join(distPath, 'index.html')));
+  // SPA fallback — app.get('*') is broken in Express 5; use middleware instead
+  app.use((req, res) => res.sendFile(join(distPath, 'index.html')));
 }
 
 const server = app.listen(PORT, () => {
