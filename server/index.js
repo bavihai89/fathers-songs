@@ -33,8 +33,11 @@ app.use('/api/nikud', nikudRouter);
 if (isProd) {
   const distPath = join(__dirname, '../dist');
   app.use(express.static(distPath));
-  // SPA fallback — app.get('*') is broken in Express 5; use middleware instead
-  app.use((req, res) => res.sendFile(join(distPath, 'index.html')));
+  // SPA fallback: serve index.html for all non-API, non-asset GET requests
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/images/')) return next();
+    res.sendFile(join(distPath, 'index.html'));
+  });
 }
 
 const server = app.listen(PORT, () => {
