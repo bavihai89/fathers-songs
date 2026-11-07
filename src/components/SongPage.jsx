@@ -1,21 +1,48 @@
-import { songs } from '../data/songs';
+import { useState } from 'react';
 
-export default function SongPage({ index, onNext, onPrev, onBack }) {
+export default function SongPage({ songs = [], index, onNext, onPrev, onBack }) {
+  const finalSongs = songs.filter(s => s.status === 'final');
   const song = songs[index];
-  const isFirst = index === 0;
-  const isLast = index === songs.length - 1;
+  const finalIndex = finalSongs.indexOf(song);
+  const isFirst = finalIndex === 0;
+  const isLast = finalIndex === finalSongs.length - 1;
+  const [showNikud, setShowNikud] = useState(false);
 
   if (!song) return null;
 
-  const stanzas = song.lyrics.split(/\n\n+/);
+  const hasNikud = !!song.lyricsNikud?.trim();
+  const activeLyrics = showNikud && hasNikud ? song.lyricsNikud : song.lyrics;
+  const stanzas = (activeLyrics || '').split(/\n\n+/);
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.page}>
+        {/* Song image — full bleed at top */}
+        {song.image && (
+          <div style={styles.songImageWrap}>
+            <img src={song.image} alt={song.title} style={styles.songImage} />
+            <div style={styles.songImageFade} />
+          </div>
+        )}
+
+        {/* Padded content area */}
+        <div style={styles.content}>
+
         {/* Navigation top */}
         <div style={styles.topNav}>
           <button style={styles.navBtn} onClick={onBack}>תוכן עניינים</button>
-          <span style={styles.pageNum}>{index + 1} / {songs.length}</span>
+          <div style={styles.topRight}>
+            {hasNikud && (
+              <button
+                style={{ ...styles.nikudToggle, ...(showNikud ? styles.nikudToggleOn : {}) }}
+                onClick={() => setShowNikud(v => !v)}
+                title={showNikud ? 'הצג ללא ניקוד' : 'הצג עם ניקוד'}
+              >
+                {showNikud ? 'ניקוד ✓' : 'ניקוד'}
+              </button>
+            )}
+            <span style={styles.pageNum}>{finalIndex + 1} / {finalSongs.length}</span>
+          </div>
         </div>
 
         <div style={styles.divider} />
@@ -44,6 +71,15 @@ export default function SongPage({ index, onNext, onPrev, onBack }) {
           ))}
         </div>
 
+        {/* Story / written-at footer */}
+        {(song.writtenAt || song.story) && (
+          <div style={styles.footer}>
+            <div style={styles.footerDivider} />
+            {song.writtenAt && <div style={styles.writtenAt}>נכתב: {song.writtenAt}</div>}
+            {song.story && <div style={styles.story}>{song.story}</div>}
+          </div>
+        )}
+
         <div style={styles.divider} />
 
         {/* Navigation bottom */}
@@ -63,6 +99,8 @@ export default function SongPage({ index, onNext, onPrev, onBack }) {
             שיר קודם →
           </button>
         </div>
+
+        </div> {/* end content */}
       </div>
     </div>
   );
@@ -82,14 +120,44 @@ const styles = {
     boxShadow: '0 20px 60px rgba(0,0,0,0.7), inset 0 0 80px rgba(139,69,19,0.08), 8px 8px 0 #8b4513',
     maxWidth: '560px',
     width: '100%',
-    padding: '2.5rem 3rem',
+    padding: '0',
     borderRadius: '2px',
+    overflow: 'hidden',
+  },
+  songImageWrap: {
+    position: 'relative',
+    width: '100%',
+    height: '220px',
+    overflow: 'hidden',
+  },
+  songImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  songImageFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '70px',
+    background: 'linear-gradient(to bottom, transparent, #f0dfc0)',
+    pointerEvents: 'none',
+  },
+  content: {
+    padding: '2.5rem 3rem',
   },
   topNav: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '1rem',
+  },
+  topRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
   },
   navBtn: {
     background: 'none',
@@ -99,6 +167,23 @@ const styles = {
     fontSize: '0.9rem',
     cursor: 'pointer',
     padding: 0,
+  },
+  nikudToggle: {
+    background: 'transparent',
+    border: '1px solid rgba(201,165,61,0.35)',
+    borderRadius: '20px',
+    color: 'rgba(44,26,14,0.45)',
+    fontFamily: "'Heebo', sans-serif",
+    fontSize: '0.76rem',
+    padding: '0.2rem 0.65rem',
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+    letterSpacing: '0.03em',
+  },
+  nikudToggleOn: {
+    background: 'rgba(201,165,61,0.12)',
+    color: '#8b6914',
+    borderColor: 'rgba(201,165,61,0.5)',
   },
   pageNum: {
     fontFamily: "'Frank Ruhl Libre', serif",
@@ -136,6 +221,7 @@ const styles = {
     color: '#2c1a0e',
     lineHeight: 2,
     textAlign: 'center',
+    margin: 0,
   },
   line: {
     display: 'inline',
@@ -147,6 +233,31 @@ const styles = {
     fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: '1rem',
+  },
+  footer: {
+    marginTop: '2rem',
+  },
+  footerDivider: {
+    height: '1px',
+    background: 'linear-gradient(to right, transparent, rgba(201,165,61,0.3), transparent)',
+    marginBottom: '1rem',
+  },
+  writtenAt: {
+    fontFamily: "'Heebo', sans-serif",
+    fontSize: '0.78rem',
+    color: 'rgba(44,26,14,0.45)',
+    textAlign: 'center',
+    marginBottom: '0.5rem',
+    letterSpacing: '0.03em',
+  },
+  story: {
+    fontFamily: "'Frank Ruhl Libre', serif",
+    fontSize: '0.9rem',
+    color: 'rgba(44,26,14,0.55)',
+    fontStyle: 'italic',
+    lineHeight: '1.75',
+    textAlign: 'right',
+    whiteSpace: 'pre-wrap',
   },
   bottomNav: {
     display: 'flex',

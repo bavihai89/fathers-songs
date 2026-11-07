@@ -1,25 +1,40 @@
-import { songs } from '../data/songs';
+function firstLine(lyrics) {
+  if (!lyrics) return '';
+  return lyrics.split('\n').find(l => l.trim()) || '';
+}
 
-export default function TableOfContents({ onSelectSong, onBack }) {
+export default function TableOfContents({ songs = [], onSelectSong, onBack, onAbout }) {
+  const finalSongs = songs.filter(s => s.status === 'final');
   return (
     <div style={styles.wrapper}>
       <div style={styles.page}>
         <button style={styles.backBtn} onClick={onBack}>← עטיפה</button>
         <h2 style={styles.heading}>תוכן העניינים</h2>
         <div style={styles.divider} />
-        {songs.length === 0 ? (
+        {finalSongs.length === 0 ? (
           <p style={styles.empty}>השירים יתווספו בקרוב...</p>
         ) : (
           <ol style={styles.list}>
-            {songs.map((song, index) => (
+            {finalSongs.map((song, index) => (
               <li key={song.id} style={styles.item}>
-                <button style={styles.songBtn} onClick={() => onSelectSong(index)}>
+                <button style={styles.songBtn} onClick={() => onSelectSong(songs.indexOf(song))}>
                   <span style={styles.number}>{index + 1}</span>
-                  <span style={styles.songTitle}>{song.title}</span>
+                  <span style={styles.songInfo}>
+                    <span style={styles.songTitle}>{song.title}</span>
+                    {firstLine(song.lyrics) && (
+                      <span style={styles.firstLine}>{firstLine(song.lyrics)}</span>
+                    )}
+                  </span>
                 </button>
               </li>
             ))}
           </ol>
+        )}
+        {onAbout && (
+          <div style={styles.aboutWrap}>
+            <div style={styles.aboutDivider} />
+            <button style={styles.aboutBtn} onClick={onAbout}>על המחבר ✦</button>
+          </div>
         )}
       </div>
     </div>
@@ -94,12 +109,30 @@ const styles = {
     fontSize: '0.9rem',
     minWidth: '1.5rem',
     textAlign: 'center',
+    flexShrink: 0,
+  },
+  songInfo: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.2rem',
+    textAlign: 'right',
   },
   songTitle: {
     fontFamily: "'Frank Ruhl Libre', serif",
     color: '#2c1a0e',
     fontSize: '1.15rem',
-    flex: 1,
+  },
+  firstLine: {
+    fontFamily: "'Frank Ruhl Libre', serif",
+    color: 'rgba(44,26,14,0.45)',
+    fontSize: '0.82rem',
+    fontStyle: 'italic',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+    display: 'block',
   },
   empty: {
     fontFamily: "'Frank Ruhl Libre', serif",
@@ -108,5 +141,23 @@ const styles = {
     fontSize: '1.1rem',
     fontStyle: 'italic',
     padding: '2rem 0',
+  },
+  aboutWrap: { marginTop: '1.75rem', textAlign: 'center' },
+  aboutDivider: {
+    height: '1px',
+    background: 'linear-gradient(to right, transparent, rgba(201,165,61,0.3), transparent)',
+    marginBottom: '1.25rem',
+  },
+  aboutBtn: {
+    background: 'none',
+    border: '1px solid rgba(201,165,61,0.35)',
+    borderRadius: '20px',
+    color: '#8b6914',
+    fontFamily: "'Frank Ruhl Libre', serif",
+    fontSize: '0.95rem',
+    padding: '0.5rem 1.5rem',
+    cursor: 'pointer',
+    letterSpacing: '0.03em',
+    transition: 'all 0.2s',
   },
 };

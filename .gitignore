@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Environment - API keys (never commit)
+.env
+
+# Public uploaded images (commit if desired)
+# public/images/*.png
+# public/images/*.jpg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

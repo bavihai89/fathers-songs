@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Secular+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=Secular+One&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -16,7 +16,12 @@
   --color-gold: #c9a53d;
   --color-muted: #7a5c3a;
   --font-main: 'Frank Ruhl Libre', 'David', serif;
+  --font-ui: 'Heebo', 'Arial Hebrew', sans-serif;
   --font-title: 'Secular One', 'Arial Hebrew', sans-serif;
+  /* Studio palette — lighter than before */
+  --studio-bg: #231810;
+  --studio-sidebar: linear-gradient(180deg, #150f07 0%, #1c1409 100%);
+  --studio-list-bg: #1c1409;
 }
 
 html, body {
@@ -41,4 +46,57 @@ html, body {
 ::-webkit-scrollbar-thumb {
   background: var(--color-accent);
   border-radius: 4px;
+}
+
+/* Print styles — clean book layout */
+@media print {
+  body {
+    background: white !important;
+    direction: rtl;
+  }
+
+  /* Hide the studio toggle and navigation UI */
+  button[title="סטודיו עריכה"],
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Page layout */
+  .print-page {
+    page-break-after: always;
+    padding: 2cm 2.5cm;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Cover page */
+  .print-cover {
+    text-align: center;
+    font-family: 'Frank Ruhl Libre', serif;
+  }
+
+  /* Song page */
+  .print-song-title {
+    font-family: 'Secular One', serif;
+    font-size: 1.8rem;
+    color: #2c1a0e;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .print-song-lyrics {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 1.1rem;
+    line-height: 2;
+    text-align: center;
+    color: #2c1a0e;
+  }
+
+  /* Navigation buttons not needed in print */
+  .nav-btn-print-hide {
+    display: none !important;
+  }
 }
